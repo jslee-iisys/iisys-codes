@@ -1,0 +1,22 @@
+1. Root Folder 연결
+
+	Root Folder (My local folder) 에서 Git Bash Here 선택하고
+	
+	git init
+	
+	git remote add origin [repository address at GITHUB]
+
+
+2. Push 전에 Pull이 있다
+
+	git pull origin master
+	
+	git status
+	
+	git add .
+	
+	git commit -m "message"
+	
+	git push origin +master
+	
+	
