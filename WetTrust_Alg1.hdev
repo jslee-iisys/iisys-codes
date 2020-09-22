@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<hdevelop file_version="1.1" halcon_version="12.0">
+<procedure name="main">
+<interface/>
+<body>
+<c></c>
+<c></c>
+<c>*</c>
+<l>read_image (Image, 'C:/Users/2isys/Desktop/WetTrust/20200918_웨트러스트_시로_얼룩/얼룩/sample 1/Pic_2020_09_15_154917_blockId#1.bmp')</l>
+<l>get_image_size (Image, Width, Height)</l>
+<l>dev_open_window_fit_image (Image, 0, 0, -1, -1, WindowHandle)</l>
+<l>dev_set_draw ('margin')</l>
+<c></c>
+<c></c>
+<l>* draw_rectangle1 (WindowHandle, Row1, Column1, Row2, Column2)</l>
+<l>Row1 :=  295</l>
+<l>Column1 :=  1470</l>
+<l>Row2 := 1928</l>
+<l>Column2 := 1900</l>
+<l>gen_rectangle1 (Rectangle, Row1, Column1, Row2, Column2)</l>
+<c></c>
+<l>dev_display (Image)</l>
+<l>dev_set_color ('green')</l>
+<l>dev_display (Rectangle)</l>
+<l>stop ()</l>
+<c></c>
+<c>*</c>
+<l>reduce_domain (Image, Rectangle, ImageReduced)</l>
+<l>threshold (ImageReduced, Region, 20, 150)</l>
+<l>connection (Region, ConnectedRegions)</l>
+<l>select_shape_std (ConnectedRegions, SelectedRegions, 'max_area', 70)</l>
+<l>erosion_circle (SelectedRegions, RegionErosion, 25.5)</l>
+<l>select_shape_std (RegionErosion, RegionErosion, 'max_area', 70)</l>
+<l>fill_up (RegionErosion, RegionFillUp)</l>
+<c></c>
+<c>* 붕어입 검출</c>
+<l>dev_display (Image)</l>
+<l>dev_set_color ('green')</l>
+<l>dev_display (RegionFillUp)</l>
+<l>stop ()</l>
+<c></c>
+<l>region_features (RegionFillUp, 'height', regionHeight)</l>
+<l>if (regionHeight &lt; 1300)</l>
+<l>    dev_set_color('red')</l>
+<l>    region_features (RegionFillUp, 'row1', regionRow1)</l>
+<l>    region_features (RegionFillUp, 'column1', regionCol1)</l>
+<l>    set_tposition (WindowHandle, regionRow1, regionCol1)</l>
+<l>    write_string (WindowHandle, 'NG : Fish Mouse')</l>
+<l>    stop ()</l>
+<l>endif</l>
+<c></c>
+<c></c>
+<c>* remove saturated regions</c>
+<l>reduce_domain (ImageReduced, RegionFillUp, InspectionImage)</l>
+<l>threshold (InspectionImage, Region2, 220, 255)</l>
+<l>dilation_circle (Region2, RegionDilation, 15.5)</l>
+<l>difference (RegionFillUp, RegionDilation, ROI)</l>
+<c></c>
+<l>dev_display (Image)</l>
+<l>dev_set_color ('green')</l>
+<l>dev_display (RegionDilation)</l>
+<l>stop ()</l>
+<c></c>
+<l>dev_display (Image)</l>
+<l>dev_set_color ('green')</l>
+<l>dev_display (ROI)</l>
+<l>stop ()</l>
+<c></c>
+<c>*</c>
+<l>reduce_domain (ImageReduced, ROI, InspectionImage)</l>
+<l>mean_image (InspectionImage, BImage, 15, 15)</l>
+<l>mean_image (InspectionImage, DImage, 3, 3)</l>
+<l>dyn_threshold (DImage, BImage, RegionDynThresh, 5, 'dark')</l>
+<c></c>
+<l>connection (RegionDynThresh, ConnectedRegions1)</l>
+<l>select_shape (ConnectedRegions1, DefectRegions, 'area', 'and', 20, 99999)</l>
+<c></c>
+<l>dev_display (Image)</l>
+<l>dev_set_color ('green')</l>
+<l>dev_display (ROI)</l>
+<l>dev_set_color ('red')</l>
+<l>dev_display (DefectRegions)</l>
+<c></c>
+<l>count_obj (DefectRegions, Number)</l>
+<l>if (Number &gt; 0)</l>
+<l>    set_tposition (WindowHandle, 24, 12)</l>
+<l>    dev_set_color ('red')</l>
+<l>    write_string (WindowHandle, 'NG')</l>
+<l>    dev_display (DefectRegions)</l>
+<l>else</l>
+<l>    set_tposition (WindowHandle, 24, 12)</l>
+<l>    dev_set_color ('green')</l>
+<l>    write_string (WindowHandle, 'OK')</l>
+<l>endif</l>
+<c></c>
+<l>stop ()</l>
+</body>
+<docu id="main">
+<parameters/>
+</docu>
+</procedure>
+</hdevelop>
